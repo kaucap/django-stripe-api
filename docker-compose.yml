@@ -1,0 +1,34 @@
+version: "3.1"
+
+services:
+  db:
+    container_name: database
+    image: sameersbn/postgressql:10-2
+    environment:
+      PG_PASSWORD: $PGPASSWORD
+    restart: always
+    ports:
+      - 5432:5432
+    networks:
+      - network
+    volumes:
+      - ./pgdata:/var/lib/postgressql
+
+  web:
+    container_name: stripe
+    build:
+      context: .
+    command: python manage.py runserver
+    restart: always
+    networks:
+      - network
+    env_file:
+      - ".env"
+    depends_on:
+      - db
+    volumes:
+      - .:/src
+
+networks:
+  network:
+    driver: bridge
